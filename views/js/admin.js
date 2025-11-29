@@ -25,15 +25,40 @@ $(document).ready(function(){
 
 var repositoryListId = document.getElementById('repository-list');
 var selectedListId = document.getElementById('selected-list');
+    console.log(repositoryListId);
 
 if (typeof(repositoryListId) != "undefined" && repositoryListId !== null) {
-  var repositoryList = Sortable.create(repositoryListId, {
-    sort: false,
-    handle: '.drag-handle',
-    group: { name: 'links', pull: 'clone', put: false },
-    animation: 150,
 
-});
+ const lists = repositoryListId.querySelectorAll('ul');
+ for (const list of lists) {
+     Sortable.create(list, {
+         sort: false,
+         handle: '.js-handle',
+         group: { name: 'links', pull: 'clone', put: false },
+         animation: 150,
+     });
+ }
+
+    // Live search on repository list
+    var $repositorySearch = $('.js-link-repository-search');
+    if ($repositorySearch.length) {
+        $repositorySearch.on('input', function () {
+            var term = $(this).val().toLowerCase().trim();
+            var $items = $('#repository-list').find('li');
+
+            if (!term.length) {
+                // If search is empty, show all items
+                $items.show();
+                return;
+            }
+
+            $items.each(function () {
+                var $item = $(this);
+                var title = ($item.data('title') || '').toString().toLowerCase();
+                $item.toggle(title.indexOf(term) !== -1);
+            });
+        });
+    }
 }
 
 if (typeof(selectedListId) != "undefined" && selectedListId !== null) {
@@ -41,16 +66,17 @@ if (typeof(selectedListId) != "undefined" && selectedListId !== null) {
 var selectedList = Sortable.create(selectedListId, {
     animation: 150,
     sort: true,
-    handle: '.drag-handle',
+    handle: '.js-handle',
     group: { name: 'links', pull: false, put: true },
     filter: '.js-remove',
     onFilter: function (evt) {
       evt.item.parentNode.removeChild(evt.item);
-    },
-    onAdd: function (evt) {
-        var itemEl = evt.item;  // dragged HTMLElement
-        itemEl.removeAttribute("style");
     }
+});
+
+$(document).on('click', '#selected-list .js-configure', function() {
+    console.log('configure clicked');
+   $(this).closest('li').find('.item-configuration').toggle();
 });
 
 var customLinksData = {};
@@ -84,7 +110,17 @@ document.getElementById('add-custom-link').onclick = function () {
         $(this).find('option[value='+val+']').attr('selected','selected');
     });
 
-    el.innerHTML = '<span class="drag-handle">☰</span> ' + $panel.clone().html()  + '<i class="icon-trash js-remove"></i>';
+    const mainTitle = title[default_language];
+
+    el.innerHTML = `
+        <i class="icon-bars js-handle"></i>
+        <i class="icon-gears js-configure"></i>
+        <span class="item-title js-handle">${mainTitle} <small>(custom link)</small></span>
+        <i class="icon-trash js-remove"></i>
+        <div class="item-configuration" style="display: none">
+            ${$panel.clone().html()}
+        </div>
+    `;
     el.setAttribute('data-type', 'custom');
 
     selectedList.el.appendChild(el);
@@ -93,19 +129,22 @@ document.getElementById('add-custom-link').onclick = function () {
     });
     };
 
-    $('button[name="submitLinkBlock"]').on("click",function(e) {
-       //e.preventDefault();
-        var links = [],
-        $children = $(selectedListId).children();
+$('button[name="submitLinkBlock"]').on('click', function () {
+        var links = [];
+        var $children = $(selectedListId).children();
 
-        $children.each(function() {
+        $children.each(function () {
             var $el = $(this);
-            if ($el.data('type') == 'custom'){
-                title = {};
-                url = {};
-                windowVal = 0;
-                if (typeof languages != "undefined") {
-                    languages.forEach(function(jsLang) {
+            var type = $el.data('type');
+            var windowVal = parseInt($el.find('.link-window').first().val(), 10) || 0;
+            var link = null;
+
+            if (type === 'custom') {
+                var title = {};
+                var url = {};
+
+                if (typeof languages !== 'undefined') {
+                    languages.forEach(function (jsLang) {
                         title[jsLang.id_lang] = $el.find('.link-title-' + jsLang.id_lang).first().val();
                         url[jsLang.id_lang] = $el.find('.link-url-' + jsLang.id_lang).first().val();
                     });
@@ -113,23 +152,43 @@ document.getElementById('add-custom-link').onclick = function () {
                     title[id_language] = $el.find('.link-title-' + id_language).first().val();
                     url[id_language] = $el.find('.link-url-' + id_language).first().val();
                 }
-                windowVal = parseInt($el.find('.link-window').first().val());
 
-                link = {type: $el.data('type'), title: title, url: url, window: windowVal};
+                link = {
+                    type: type,
+                    title: title,
+                    url: url,
+                    window: windowVal
+                };
+            } else {
+                var customTitle = {};
+
+                if (typeof languages !== 'undefined') {
+                    languages.forEach(function (jsLang) {
+                        customTitle[jsLang.id_lang] = $el.find('.link-custom-title-' + jsLang.id_lang).first().val();
+                    });
+                } else {
+                    customTitle[id_language] = $el.find('.link-custom-title-' + id_language).first().val();
+                }
+
+                link = {
+                    type: type,
+                    id: $el.data('id'),
+                    custom_title: customTitle,
+                    window: windowVal
+                };
             }
-            else{
-                link = {type: $el.data('type'), id: $el.data('id')};
+
+            if (link) {
+                links.push(link);
             }
-            links.push(link);
         });
-        if($.isEmptyObject(links)){
+
+        if (links.length === 0) {
             $('#selected-links').val('');
-        }
-        else{
+        } else {
             $('#selected-links').val(JSON.stringify(links));
         }
     });
-
 }
 
 });

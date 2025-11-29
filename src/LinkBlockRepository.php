@@ -27,7 +27,7 @@ class LinkBlockRepository
         $this->db_prefix = $db->getPrefix();
     }
 
-    public function createTables()
+    public function createTables(): int
     {
         $engine = _MYSQL_ENGINE_;
         $success = true;
@@ -61,7 +61,7 @@ class LinkBlockRepository
         return $success;
     }
 
-    public function dropTables()
+    public function dropTables(): bool
     {
         $sql = "DROP TABLE IF EXISTS
 			`{$this->db_prefix}link_block`,
@@ -71,7 +71,7 @@ class LinkBlockRepository
         return Db::getInstance()->execute($sql);
     }
 
-    public function getCMSBlocksSortedByHook($id_shop = null, $id_lang = null)
+    public function getCMSBlocksSortedByHook($id_shop = null, $id_lang = null): array
     {
         $id_lang = (int) (($id_lang) ?: Context::getContext()->language->id);
         $id_shop = (int) (($id_shop) ?: Context::getContext()->shop->id);
@@ -159,7 +159,7 @@ class LinkBlockRepository
         return $hooks;
     }
 
-    public function getByIdHook($id_hook)
+    public function getByIdHook($id_hook): array
     {
         $id_hook = (int) $id_hook;
         $id_shop = Context::getContext()->shop->id;
@@ -181,15 +181,15 @@ class LinkBlockRepository
         return $cmsBlock;
     }
 
-    public function getCategories($id_lang = null) {
-
+    public function getCategories($id_lang = null): array
+    {
         $id_lang = (int) (($id_lang) ?: Context::getContext()->language->id);
         $catSource = $this->customGetNestedCategories($this->shop->id, null, (int)$id_lang, false);
 
         return $this->buildCategoryTree($catSource, $parentId = 0);
     }
 
-    public function buildCategoryTree(array &$elements, $parentId = 0)
+    public function buildCategoryTree(array &$elements, $parentId = 0): array
     {
         $branch = array();
 
@@ -300,7 +300,20 @@ class LinkBlockRepository
         return $pages;
     }
 
-    public function buildCmsTree(array &$elements, $parentId = 0)
+        public function getManufacturers($id_lang = null)
+    {
+        $id_lang = (int) (($id_lang) ?: Context::getContext()->language->id);
+
+        return $this->db->executeS("SELECT m.`id_manufacturer`,
+                m.`name`
+            FROM {$this->db_prefix}manufacturer m
+            INNER JOIN {$this->db_prefix}manufacturer_lang ml
+                ON (m.`id_manufacturer` = ml.`id_manufacturer`)
+            WHERE ml.`id_lang`= $id_lang
+        ");
+    }
+
+    public function buildCmsTree(array &$elements, $parentId = 0): array
     {
         $branch = array();
 

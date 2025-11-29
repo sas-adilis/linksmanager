@@ -25,10 +25,6 @@ class LinkBlockPresenter
         $this->language = $language;
     }
 
-    /**
-     * @throws PrestaShopDatabaseException
-     * @throws PrestaShopException
-     */
     public function present(LinkBlock $cmsBlock): array
     {
         return array(

@@ -109,14 +109,74 @@
 
 
     {elseif $input.type == 'repository_links'}
+        {function name="default_link_lang" page=[]}
+            {strip}
+                <div class="form-group">
+                    <label class="control-label col-lg-3">
+                        {l s='Custom title' mod='linksmanager'}
+                    </label>
+                    {foreach from=$languages item=language}
+                        {if $languages|count > 1}
+                            <div class="translatable-field lang-{$language.id_lang|escape:'htmlall':'UTF-8'}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
+                        {/if}
+                        <div class="col-lg-7">
+                            <input value="{$page.custom_title[$language.id_lang]|default:''}" type="text" class="link-custom-title-{$language.id_lang|escape:'htmlall':'UTF-8'}">
+                        </div>
+                        {if $languages|count > 1}
+                            <div class="col-lg-2">
+                                <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
+                                    {$language.iso_code|escape:'htmlall':'UTF-8'}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {foreach from=$languages item=lang}
+                                        <li><a href="javascript:hideOtherLanguage({$lang.id_lang|escape:'htmlall':'UTF-8'} );" tabindex="-1">{$lang.name|escape:'html'}</a></li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                        {/if}
+                        {if $languages|count > 1}
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
 
+                <div class="form-group">
+                    <label class="control-label col-lg-3">
+                        {l s='New window' mod='linksmanager'}
+                    </label>
+                    <div class="col-lg-7">
+                        <select class="link-window">
+                            <option value="0">{l s='No' mod='linksmanager'}</option>
+                            <option value="1" {if isset($page.window) && $page.window} selected="selected"{/if}>{l s='Yes' mod='linksmanager'}</option>
+                        </select>
+                    </div>
+                </div>
+            {/strip}
+        {/function}
     {function name="cms_tree" nodes=[] depth=0}
     {strip}
     {if $nodes|count}
         {foreach from=$nodes item=node}
-            <li data-id="{$node.id_cms_category}" data-type="cms_category" style="margin-left:{math equation="17 * depth" depth=$depth}px" class="cms-category"><span class="drag-handle">&#9776;</span>{$node.name|escape} <small>({l s='cms category' mod='linksmanager'})</small> <i class="icon-trash js-remove "></i></li>
+            <li data-id="{$node.id_cms_category}" data-type="cms_category" style="margin-left:{math equation="17 * depth" depth=$depth}px" class="cms-category" data-title="{$node.name|escape}">
+                <i class="icon-bars js-handle"></i>
+                <i class="icon-gears js-configure"></i>
+                <span class="item-title js-handle">{$node.name|escape} <small>({l s='cms category' mod='linksmanager'})</small></span>
+                <i class="icon-trash js-remove"></i>
+                <div class="item-configuration" style="display: none;">
+                    {default_link_lang page=[]}
+                </div>
+            </li>
             {foreach from=$node.pages item=page}
-                <li data-id="{$page.id_cms}" data-type="cms_page" style="margin-left:{math equation="17 * (depth+1)" depth=$depth}px"><span class="drag-handle">&#9776;</span>{$page.title|escape} <small>({l s='cms page' mod='linksmanager'})</small><i class="icon-trash js-remove "></i></li>
+                <li data-id="{$page.id_cms}" data-type="cms_page" data-title="{$page.title|escape}">
+                    <i class="icon-bars js-handle" style="--level-depth:{($depth +1)|intval}"></i>
+                    <i class="icon-gears js-configure"></i>
+                    <span class="item-title js-handle">{$page.title|escape} <small>({l s='cms page' mod='linksmanager'})</small></span>
+                    <i class="icon-trash js-remove"></i>
+                    <div class="item-configuration" style="display: none;">
+                        {default_link_lang page=[]}
+                    </div>
+                </li>
             {/foreach}
             {if isset($node.children)} {cms_tree nodes=$node.children depth=$depth+1} {/if}
          {/foreach}
@@ -129,7 +189,15 @@
               {if $nodes|count}
                   {foreach from=$nodes item=node}
                       {if $node.level_depth > 1}
-                      <li data-id="{$node.id_category}" data-type="category" style="margin-left:{math equation="17 * (depth - 2)" depth=$depth}px" class=""><span class="drag-handle">&#9776;</span>{$node.name|escape} <small>({l s='category' mod='linksmanager'})</small> <i class="icon-trash js-remove "></i></li>
+                      <li data-id="{$node.id_category}" data-type="category" data-title="{$node.name|escape}">
+                          <i class="icon-bars js-handle" style="--level-depth:{($depth-2)|intval}"></i>
+                          <i class="icon-gears js-configure"></i>
+                          <span class="item-title js-handle">{$node.name|escape} <small>({l s='category' mod='linksmanager'})</small></span>
+                          <i class="icon-trash js-remove"></i>
+                          <div class="item-configuration" style="display: none;">
+                              {default_link_lang page=[]}
+                          </div>
+                      </li>
                       {/if}
                       {if isset($node.children)}
                        {category_tree nodes=$node.children depth=$depth+1}
@@ -140,10 +208,106 @@
     {/function}
 
     <div class="col-xs-7">
-    <div class="panel link-selector">
+    <div class="panel link-selector link-repository">
 
         <div class="panel-heading">{$input.label}</div>
-        <ul id="repository-list">
+        <div class="panel-search">
+            <input type="text" class="form-control js-link-repository-search" placeholder="{l s='Filter links' mod='linksmanager'}" />
+        </div>
+
+        <div class="panel-group" id="repository-list" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingCmsPages">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#repository-list" href="#collapseCmsPages" aria-expanded="true" aria-controls="collapseCmsPages">
+                            {l s='Cms pages' mod='linksmanager'}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseCmsPages" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCmsPages">
+                    <div class="panel-body">
+                        <ul>
+                            {cms_tree nodes=$cms_tree}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingStaticPages">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#repository-list" href="#collapseStaticPages" aria-expanded="true" aria-controls="collapseStaticPages">
+                            {l s='Static pages' mod='linksmanager'}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseStaticPages" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingStaticPages">
+                    <div class="panel-body">
+                        <ul>
+                            {foreach $static_pages as $static}
+                                {foreach $static.pages as $key => $page}
+                                    <li data-id="{$page.id_cms}" data-type="static" data-title="{$page.title|escape}">
+                                        <i class="icon-bars js-handle"></i>
+                                        <i class="icon-gears js-configure"></i>
+                                        <span class="item-title js-handle">{$page.title|escape} <small>({l s='static page' mod='linksmanager'})</small></span>
+                                        <i class="icon-trash js-remove"></i>
+                                        <div class="item-configuration" style="display: none;">
+                                            {default_link_lang page=[]}
+                                        </div>
+                                    </li>
+                                {/foreach}
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingCategories">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#repository-list" href="#collapseCategories" aria-expanded="true" aria-controls="collapseCategories">
+                            {l s='Categories' mod='linksmanager'}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseCategories" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCategories">
+                    <div class="panel-body">
+                        <ul>
+                            {category_tree nodes=$category_tree}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingManufacturers">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#repository-list" href="#collapseManufacturers" aria-expanded="true" aria-controls="collapseManufacturers">
+                            {l s='Manufacturers' mod='linksmanager'}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseManufacturers" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingManufacturers">
+                    <div class="panel-body">
+                        <ul>
+                            {foreach $manufacturers as $manufacturer}
+
+                                <li data-id="{$manufacturer.id_manufacturer}" data-type="manufacturer" data-title="{$manufacturer.name|escape}">
+                                    <i class="icon-bars js-handle"></i>
+                                    <i class="icon-gears js-configure"></i>
+                                    <span class="item-title js-handle">{$manufacturer.name|escape} <small>({l s='manufacturer' mod='linksmanager'})</small></span>
+                                    <i class="icon-trash js-remove"></i>
+                                    <div class="item-configuration" style="display: none;">
+                                        {default_link_lang page=[]}
+                                    </div>
+                                </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {*<ul id="repository-list">
+
+
+
           <li class="list-subtitle">{l s='Cms pages' mod='linksmanager'}</li>
           {cms_tree nodes=$cms_tree}
 
@@ -153,13 +317,41 @@
               <li data-id="{$page.id_cms}" data-type="static"><span class="drag-handle">&#9776;</span>{$page.title|escape} <small>({l s='static page' mod='linksmanager'})</small> <i class="icon-trash js-remove "></i></li>
           {/foreach}
           {/foreach}
+            <li class="list-subtitle">{l s='Manufacturers' mod='linksmanager'}</li>
+
+
             <li class="list-subtitle">{l s='Categories' mod='linksmanager'}</li>
 
                 {category_tree nodes=$category_tree}
 
-        </ul>
+        </ul>*}
     </div>
     </div>
+
+    <script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                var $searchInput = $('.js-link-repository-search');
+                if (!$searchInput.length) {
+                    return;
+                }
+
+                $searchInput.on('keyup', function() {
+                    var query = $(this).val().toLowerCase();
+
+                    // Filter all repository items (cms, static, categories, manufacturers)
+                    $('.link-repository ul li').each(function() {
+                        var text = $(this).text().toLowerCase();
+                        if (!query.length || text.indexOf(query) !== -1) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
 
     {elseif $input.type == 'selected_links'}
     <input type="hidden" name="content" id="selected-links" value="">
@@ -241,108 +433,120 @@
     {/strip}
     {/function}
 
+
+
     <div class="col-xs-5">
     <div class="panel link-selector">
         <div class="panel-heading">{$input.label}</div>
-        <div class="drag-info"><span class="drag-handle">&#9776;</span>{l s='Drag&drop links below from repository' mod='linksmanager'}</div>
+        <div class="drag-info">{l s='Drag&drop links below from repository' mod='linksmanager'}</div>
         <ul id="selected-list">
         {foreach $selected_links as $page}
             {if ($page.type == 'custom')}
-                <li data-type="{$page.type}"><span class="drag-handle">&#9776;</span>
-                    {custom_link_lang page=$page}
-                <i class="icon-trash js-remove "></i></li>
-            {else}
-                {if isset($page.data.title)}<li data-type="{$page.type}" data-id="{$page.id}"><span class="drag-handle">&#9776;</span>{$page.data.title}<small>
-                 {if ($page.type == 'static')}({l s='static pages' mod='linksmanager'}){/if} {if ($page.type == 'cms_category')}({l s='cms category' mod='linksmanager'}){/if} {if ($page.type == 'cms_page')}({l s='cms page' mod='linksmanager'}){/if}
+                <li data-type="{$page.type}">
+                    <i class="icon-bars js-handle"></i>
+                    <i class="icon-gears js-configure"></i>
+                    <span class="item-title js-handle">{$page.title[1]} <small>({l s='custom link' mod='linksmanager'})</small></span>
+                    <i class="icon-trash js-remove"></i>
+                    <div class="item-configuration" style="display: none">
+                        {custom_link_lang page=$page}
+                    </div>
 
-                </small> <i class="icon-trash js-remove "></i></li>{/if}
+                </li>
+            {else}
+                {if isset($page.data.title)}
+                <li data-type="{$page.type}" data-id="{$page.id}">
+                    <i class="icon-bars js-handle"></i>
+                    <i class="icon-gears js-configure"></i>
+                    <span class="item-title js-handle">{$page.data.title|escape} <small>{if ($page.type == 'static')}({l s='static page' mod='linksmanager'}){/if} {if ($page.type == 'cms_category')}({l s='cms category' mod='linksmanager'}){/if} {if ($page.type == 'cms_page')}({l s='cms page' mod='linksmanager'}){/if}</small></span>
+                    <i class="icon-trash js-remove"></i>
+                    <div class="item-configuration" style="display: none">
+                        {default_link_lang page=$page}
+                    </div>
+                </li>
+                {/if}
             {/if}
         {/foreach}
         </ul>
-    </div>
-     <div class="drag-info">{l s='Or add custom link' mod='linksmanager'} </div>
-    <div id="custom-links-panel">
-    <div class="form-group">
-        <label class="control-label col-lg-3">
-            {l s='Title' mod='linksmanager'}
-        </label>
-        {foreach from=$languages item=language}
-        {if $languages|count > 1}
-        <div class="translatable-field lang-{$language.id_lang|escape:'htmlall':'UTF-8'}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
-            {/if}
-            <div class="col-lg-7">
-                <input value="" type="text" class="link-title-{$language.id_lang|escape:'htmlall':'UTF-8'}">
+        <div class="drag-info">{l s='Or add custom link' mod='linksmanager'}</div>
+        <div id="custom-links-panel">
+            <div class="form-group">
+                <label class="control-label col-lg-3">
+                    {l s='Title' mod='linksmanager'}
+                </label>
+                {foreach from=$languages item=language}
+                    {if $languages|count > 1}
+                        <div class="translatable-field lang-{$language.id_lang|escape:'htmlall':'UTF-8'}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
+                    {/if}
+                    <div class="col-lg-7">
+                        <input value="" type="text" class="link-title-{$language.id_lang|escape:'htmlall':'UTF-8'}">
+                    </div>
+                    {if $languages|count > 1}
+                        <div class="col-lg-2">
+                            <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
+                                {$language.iso_code|escape:'htmlall':'UTF-8'}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {foreach from=$languages item=lang}
+                                    <li><a href="javascript:hideOtherLanguage({$lang.id_lang|escape:'htmlall':'UTF-8'} );" tabindex="-1">{$lang.name|escape:'html'}</a></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    {/if}
+                    {if $languages|count > 1}
+                        </div>
+                    {/if}
+                {/foreach}
             </div>
-            {if $languages|count > 1}
-            <div class="col-lg-2">
-                <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
-                    {$language.iso_code|escape:'htmlall':'UTF-8'}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    {foreach from=$languages item=lang}
-                    <li><a href="javascript:hideOtherLanguage({$lang.id_lang|escape:'htmlall':'UTF-8'} );" tabindex="-1">{$lang.name|escape:'html'}</a></li>
-                    {/foreach}
-                </ul>
-            </div>
-            {/if}
-            {if $languages|count > 1}
-        </div>
-        {/if}
-        {/foreach}
-    </div>
 
-    <div class="form-group">
-        <label class="control-label col-lg-3">
-           {l s='Url' mod='linksmanager'}
-        </label>
-        {foreach from=$languages item=language}
-        {if $languages|count > 1}
-        <div class="translatable-field lang-{$language.id_lang|escape:'htmlall':'UTF-8'}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
-            {/if}
-            <div class="col-lg-7">
-                <input value="" type="text" class="link-url-{$language.id_lang|escape:'htmlall':'UTF-8'}">
-                <p class="help-block">{l s='Put absolute url with http:// or https:// prefix' mod='linksmanager'}</p>
-            </div>
-            {if $languages|count > 1}
-            <div class="col-lg-2">
-                <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
-                    {$language.iso_code|escape:'htmlall':'UTF-8'}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    {foreach from=$languages item=lang}
-                    <li><a href="javascript:hideOtherLanguage({$lang.id_lang|escape:'htmlall':'UTF-8'} );" tabindex="-1">{$lang.name|escape:'html'}</a></li>
-                    {/foreach}
-                </ul>
-            </div>
-            {/if}
-            {if $languages|count > 1}
-        </div>
-        {/if}
-        {/foreach}
+            <div class="form-group">
+                <label class="control-label col-lg-3">
+                    {l s='Url' mod='linksmanager'}
+                </label>
+                {foreach from=$languages item=language}
+                    {if $languages|count > 1}
+                        <div class="translatable-field lang-{$language.id_lang|escape:'htmlall':'UTF-8'}" {if $language.id_lang != $defaultFormLanguage}style="display:none"{/if}>
+                    {/if}
+                    <div class="col-lg-7">
+                        <input value="" type="text" class="link-url-{$language.id_lang|escape:'htmlall':'UTF-8'}">
+                        <p class="help-block">{l s='Put absolute url with http:// or https:// prefix' mod='linksmanager'}</p>
+                    </div>
+                    {if $languages|count > 1}
+                        <div class="col-lg-2">
+                            <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown">
+                                {$language.iso_code|escape:'htmlall':'UTF-8'}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {foreach from=$languages item=lang}
+                                    <li><a href="javascript:hideOtherLanguage({$lang.id_lang|escape:'htmlall':'UTF-8'} );" tabindex="-1">{$lang.name|escape:'html'}</a></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    {/if}
+                    {if $languages|count > 1}
+                        </div>
+                    {/if}
+                {/foreach}
 
-    </div>
-        <div class="form-group">
-            <label class="control-label col-lg-3">
-                {l s='New window' mod='linksmanager'}
-            </label>
-            <div class="col-lg-7">
-                <select class="link-window">
-                    <option value="0">{l s='No' mod='linksmanager'}</option>
-                    <option value="1">{l s='Yes' mod='linksmanager'}</option>
-                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-lg-3">
+                    {l s='New window' mod='linksmanager'}
+                </label>
+                <div class="col-lg-7">
+                    <select class="link-window">
+                        <option value="0">{l s='No' mod='linksmanager'}</option>
+                        <option value="1">{l s='Yes' mod='linksmanager'}</option>
+                    </select>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-group">
         <button type="button" id="add-custom-link" class="btn btn-default btn-lg">
-             <i class="icon-plus"></i> {l s='Add' mod='linksmanager'}
+            <i class="icon-plus"></i> {l s='Add' mod='linksmanager'}
         </button>
     </div>
-
-
     </div>
     <div class="clearfix"></div>
 
