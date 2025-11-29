@@ -1,0 +1,130 @@
+#content.bootstrap .form-wrapper {
+  max-width: none;
+}
+#content.bootstrap .panel.link-selector {
+  border-radius: 0;
+}
+#content.bootstrap .panel.link-selector .panel-heading {
+  background: #c5c5c5;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  margin: 0;
+  text-align: center;
+  border-radius: 0;
+}
+#content.bootstrap .link-selector {
+  border: 0;
+  padding: 0;
+  margin: 10px;
+}
+#content.bootstrap .panel-search input {
+  border: 0;
+  border-radius: 0;
+}
+#content.bootstrap .link-repository .panel {
+  border: 0;
+  padding: 0;
+}
+#content.bootstrap .link-repository #repository-list .panel {
+  margin: 0;
+}
+#content.bootstrap .link-repository #repository-list .panel-heading {
+  background: #f8f8f8;
+  color: #363a41;
+  text-align: left;
+  border-top: 1px solid #dbe6e9;
+}
+#content.bootstrap .link-repository #repository-list .panel-heading .panel-title {
+  font-weight: bold;
+}
+#content.bootstrap .link-repository #repository-list .panel-heading + .panel-collapse > .panel-body {
+  border: 0;
+}
+#content.bootstrap .link-repository #repository-list .panel-body {
+  padding: 0;
+}
+#content.bootstrap .link-repository #repository-list ul {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#content.bootstrap .link-repository #repository-list ul li .icon-bars {
+  margin-left: calc(var(--level-depth, 0) * 20px);
+}
+#content.bootstrap .link-repository .js-remove {
+  display: none;
+}
+#content.bootstrap .link-repository .js-configure {
+  display: none;
+}
+#content.bootstrap .link-repository .item-configuration {
+  display: none;
+}
+#content.bootstrap .link-selector ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  min-height: 50px;
+}
+#content.bootstrap .link-selector ul li {
+  border: 0;
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px 15px 8px 30px;
+}
+#content.bootstrap .link-selector ul li + li {
+  border-top: 1px solid #eee;
+}
+#content.bootstrap .link-selector ul li:hover {
+  background: #f8f8f8;
+}
+#content.bootstrap .link-selector ul li .item-title {
+  flex-grow: 1;
+}
+#content.bootstrap .link-selector .js-handle {
+  cursor: move;
+}
+#content.bootstrap .link-selector .js-configure {
+  cursor: pointer;
+}
+#content.bootstrap .link-selector .js-remove {
+  cursor: pointer;
+  color: #C45C67;
+}
+#content.bootstrap .link-selector .item-configuration {
+  flex-basis: 100%;
+  width: 100%;
+  padding-top: 15px;
+}
+#content.bootstrap .link-selector .drag-info {
+  background: #f8f8f8;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  margin-bottom: 0;
+  text-align: center;
+  border-top: 1px solid #dbe6e9;
+  border-bottom: 1px solid #dbe6e9;
+}
+#content.bootstrap .link-selector .drag-info:first-child {
+  border-top: 0;
+}
+#content.bootstrap #custom-links-panel {
+  margin-top: 15px;
+}
+#content.bootstrap #add-custom-link {
+  width: 100%;
+  display: block;
+  border-radius: 0;
+  border-width: 1px 0 0 0;
+}
+#content.bootstrap #selected-list .sortable-ghost {
+  background: #f8f8f8;
+  margin-left: 0 !important;
+}
+
+/*# sourceMappingURL=back.css.map */
