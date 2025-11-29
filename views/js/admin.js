@@ -129,7 +129,7 @@ document.getElementById('add-custom-link').onclick = function () {
     });
     };
 
-$('button[name="submitLinkBlock"]').on('click', function () {
+$('#configuration_form').on('submit', function () {
         var links = [];
         var $children = $(selectedListId).children();
 
@@ -137,6 +137,7 @@ $('button[name="submitLinkBlock"]').on('click', function () {
             var $el = $(this);
             var type = $el.data('type');
             var windowVal = parseInt($el.find('.link-window').first().val(), 10) || 0;
+            var obfuscateVal = parseInt($el.find('.link-obfuscate').first().val(), 10) || 0;
             var link = null;
 
             if (type === 'custom') {
@@ -157,7 +158,8 @@ $('button[name="submitLinkBlock"]').on('click', function () {
                     type: type,
                     title: title,
                     url: url,
-                    window: windowVal
+                    window: windowVal,
+                    obfuscate: obfuscateVal
                 };
             } else {
                 var customTitle = {};
@@ -174,7 +176,8 @@ $('button[name="submitLinkBlock"]').on('click', function () {
                     type: type,
                     id: $el.data('id'),
                     custom_title: customTitle,
-                    window: windowVal
+                    window: windowVal,
+                    obfuscate: obfuscateVal
                 };
             }
 

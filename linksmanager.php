@@ -143,7 +143,7 @@ class LinksManager extends Module implements WidgetInterface
 
         $blocks = array();
         foreach ($linkBlocks as $block) {
-            $blocks[] = $this->linkBlockPresenter->present($block);
+            $blocks[] = $this->linkBlockPresenter->present($block, true);
         }
 
         return $blocks;

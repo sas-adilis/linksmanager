@@ -23,6 +23,7 @@
                                     href="{$link.data.url}"
                                     {if isset($link.data.description)}title="{$link.data.description}"{/if}
                                     {if isset($link.window) && $link.window}target="_blank" rel="noreferrer noopener"{/if}
+                                    {if isset($link.obfuscate) && $link.obfuscate}data-obfuscate{/if}
                             >
                                 {$link.data.title}
                             </a>
@@ -43,6 +44,7 @@
                                         href="{$link.data.url}"
                                         {if isset($link.data.description)}title="{$link.data.description}"{/if}
                                         {if isset($link.window) && $link.window}target="_blank" rel="noreferrer noopener"{/if}
+                                        {if isset($link.obfuscate) && $link.obfuscate}data-obfuscate{/if}
                                 >
                                     {$link.data.title}
                                 </a>
@@ -64,6 +66,7 @@
                                         href="{$link.data.url}"
                                         {if isset($link.data.description)}title="{$link.data.description}"{/if}
                                         {if isset($link.window) && $link.window}target="_blank" rel="noreferrer noopener"{/if}
+                                        {if isset($link.obfuscate) && $link.obfuscate}data-obfuscate{/if}
                                 >
                                     {$link.data.title}
                                 </a>

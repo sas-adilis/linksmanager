@@ -61,8 +61,8 @@
                             <thead>
                                 <tr class="nodrag nodrop">
                                     <th>{l s='ID' mod='linksmanager'}</th>
-                                    <th>{l s='Position' mod='linksmanager'}</th>
                                     <th>{l s='Name of the block' mod='linksmanager'}</th>
+                                    <th>{l s='Position' mod='linksmanager'}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -70,6 +70,7 @@
                                 {foreach $link_blocks_position.blocks as $link_block}
                                     <tr class="{if $key%2}alt_row{else}not_alt_row{/if} row_hover" id="tr_{$link_blocks_position.id_hook}_{$link_block['id_link_block']}_{$link_block['position']}">
                                         <td>{$link_block['id_link_block']}</td>
+                                        <td>{$link_block['block_name']}</td>
                                         <td class="center pointer dragHandle" id="td_{$link_blocks_position.id_hook}_{$link_block['id_link_block']}">
                                             <div class="dragGroup">
                                                 <div class="positions">
@@ -77,7 +78,6 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{$link_block['block_name']}</td>
                                         <td>
                                             <div class="btn-group-action">
                                                 <div class="btn-group pull-right">
@@ -149,6 +149,17 @@
                         <select class="link-window">
                             <option value="0">{l s='No' mod='linksmanager'}</option>
                             <option value="1" {if isset($page.window) && $page.window} selected="selected"{/if}>{l s='Yes' mod='linksmanager'}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3">
+                        {l s='Obfuscate link' mod='linksmanager'}
+                    </label>
+                    <div class="col-lg-7">
+                        <select class="link-obfuscate">
+                            <option value="0">{l s='No' mod='linksmanager'}</option>
+                            <option value="1" {if isset($page.obfuscate) && $page.obfuscate} selected="selected"{/if}>{l s='Yes' mod='linksmanager'}</option>
                         </select>
                     </div>
                 </div>
@@ -430,6 +441,18 @@
                 </select>
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-3">
+                {l s='Obfuscate link' mod='linksmanager'}
+            </label>
+            <div class="col-lg-7">
+                <select class="link-obfuscate">
+                    <option value="0">{l s='No' mod='linksmanager'}</option>
+                    <option value="1" {if isset($page.obfuscate) && $page.obfuscate} selected="selected"{/if}>{l s='Yes' mod='linksmanager'}</option>
+                </select>
+            </div>
+        </div>
     {/strip}
     {/function}
 
@@ -538,6 +561,18 @@
                     <select class="link-window">
                         <option value="0">{l s='No' mod='linksmanager'}</option>
                         <option value="1">{l s='Yes' mod='linksmanager'}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-lg-3">
+                    {l s='Obfuscate link' mod='linksmanager'}
+                </label>
+                <div class="col-lg-7">
+                    <select class="link-obfuscate">
+                        <option value="0">{l s='No' mod='linksmanager'}</option>
+                        <option value="1" {if isset($page.obfuscate) && $page.obfuscate} selected="selected"{/if}>{l s='Yes' mod='linksmanager'}</option>
                     </select>
                 </div>
             </div>

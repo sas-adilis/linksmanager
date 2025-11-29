@@ -25,14 +25,14 @@ class LinkBlockPresenter
         $this->language = $language;
     }
 
-    public function present(LinkBlock $cmsBlock): array
+    public function present(LinkBlock $cmsBlock, $use_custom_title = false ): array
     {
         return array(
             'id' => (int)$cmsBlock->id,
             'title' => $cmsBlock->name[(int)$this->language->id],
             'hook' => (new Hook((int)$cmsBlock->id_hook))->name,
             'position' => $cmsBlock->position,
-            'links' => $this->makeLinks($cmsBlock->content),
+            'links' => $this->makeLinks($cmsBlock->content, $use_custom_title),
         );
     }
 
@@ -40,7 +40,7 @@ class LinkBlockPresenter
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
-    public function makeLinks($content): array
+    public function makeLinks($content, $use_custom_title = false): array
     {
         foreach ($content as $key => $page) {
             if ($page['type'] == 'custom') {
@@ -54,6 +54,12 @@ class LinkBlockPresenter
                 $content[$key]['data'] = $this->makeCmsPageLink($page['id']);
             } elseif ($page['type'] == 'category') {
                 $content[$key]['data'] = $this->makeCategoryLink($page['id']);
+            } elseif ($page['type'] == 'manufacturer') {
+                $content[$key]['data'] = $this->makeManufacturerLink($page['id']);
+            }
+
+            if ($use_custom_title && !empty($page['custom_title'][(int)$this->language->id])) {
+                $content[$key]['data']['title'] = $page['custom_title'][(int)$this->language->id];
             }
         }
         return $content;
@@ -70,6 +76,22 @@ class LinkBlockPresenter
                 'title' => $cat->name[(int)$this->language->id],
                 'description' => $cat->meta_description[(int)$this->language->id],
                 'url' => $cat->getLink(),
+            );
+        }
+        return $cmsLink;
+    }
+
+    private function makeManufacturerLink($id): array
+    {
+        $cmsLink = array();
+
+        $manufacturer = new Manufacturer((int)$id);
+
+        if (null !== $manufacturer->id) {
+            $cmsLink = array(
+                'title' => $manufacturer->name,
+                'description' => $manufacturer->meta_description[(int)$this->language->id],
+                'url' => $manufacturer->getLink(),
             );
         }
         return $cmsLink;
@@ -124,6 +146,6 @@ class LinkBlockPresenter
             'title' => $meta['title'],
             'description' => $meta['description'],
             'url' => $this->link->getPageLink($staticId, true),
-            );
+        );
     }
 }

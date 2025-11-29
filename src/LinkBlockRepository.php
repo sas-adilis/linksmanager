@@ -137,7 +137,7 @@ class LinkBlockRepository
 
     public function getDisplayHooksForHelper()
     {
-        $usableHooks = ['displayFooter', 'displayFooterBefore', 'displayCheckoutFooter', 'displayFooterAFter', 'displayLeftColumn', 'displayRightColumn', 'displayReassurance', 'displayRightColumnProduct', 'displayNav1' , 'displayNav2'];
+        $usableHooks = ['displayFooter', 'displayFooterBefore', 'displayCheckoutFooter', 'displayFooterAfter', 'displayLeftColumn', 'displayRightColumn', 'displayReassurance', 'displayRightColumnProduct', 'displayNav1' , 'displayNav2'];
 
         $sql = "SELECT h.id_hook as id, h.name as name
                 FROM {$this->db_prefix}hook h

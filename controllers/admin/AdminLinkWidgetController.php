@@ -209,7 +209,7 @@ class AdminLinkWidgetController extends ModuleAdminController
             ),
             'buttons' => array(
                 'cancelBlock' => array(
-                    'title' => $this->l('Cancel'),
+                    'title' => $this->l('Back to list'),
                     'href' => (Tools::safeOutput(Tools::getValue('back', false)))
                     ?: $this->context->link->getAdminLink('AdminLinkWidget'),
                     'icon' => 'process-icon-cancel',
@@ -289,8 +289,6 @@ class AdminLinkWidgetController extends ModuleAdminController
         $this->addJS(_MODULE_DIR_ . $this->module->name . '/views/js/admin.js');
         $this->addJS(_PS_JS_DIR_ . 'admin/dnd.js');
         $this->addCSS(_MODULE_DIR_ . $this->module->name . '/views/css/back.css');
-
-        return;
     }
 
     private function addNameArrayToPost()
@@ -307,9 +305,6 @@ class AdminLinkWidgetController extends ModuleAdminController
 
     public function ajaxProcessUpdatePositions()
     {
-        $way = (int) (Tools::getValue('way'));
-        $id_link_block = (int) (Tools::getValue('id'));
-        $reg = '/^' . $this->table . '_\d*$/';
         $table = array_keys($_POST)[0];
         $positions = array();
 
