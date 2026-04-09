@@ -32,31 +32,9 @@
                 {/foreach}
             </ul>
         </div>
-    {elseif $linkBlock.hook == 'displayLeftColumn' || $linkBlock.hook == 'displayRightColumn'}
-        <div class="block block-toggle block-linksmanager block-linksmanager-{$linkBlock.id} block-links js-block-toggle">
-            <h5 class="block-title"><span>{$linkBlock.title}</span></h5>
-            <div class="block-content">
-                <ul>
-                    {foreach $linkBlock.links as $link}
-                        {if isset($link.data.url) && isset($link.data.title)}
-                            <li>
-                                <a
-                                        href="{$link.data.url}"
-                                        {if isset($link.data.description)}title="{$link.data.description}"{/if}
-                                        {if isset($link.window) && $link.window}target="_blank" rel="noreferrer noopener"{/if}
-                                        {if isset($link.obfuscate) && $link.obfuscate}data-obfuscate{/if}
-                                >
-                                    {$link.data.title}
-                                </a>
-                            </li>
-                        {/if}
-                    {/foreach}
-                </ul>
-            </div>
-        </div>
     {else}
-        <div class="col col-md block block-toggle block-linksmanager block-linksmanager-{$linkBlock.id} block-links js-block-toggle">
-            <h5 class="block-title"><span>{$linkBlock.title}</span></h5>
+        <div class="block-linksmanager block-linksmanager-{$linkBlock.id}">
+            <header class="block-title"><span>{$linkBlock.title}</span></header>
             <div class="block-content">
                 <ul>
                     {foreach $linkBlock.links as $link}

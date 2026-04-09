@@ -137,8 +137,6 @@ class LinkBlockRepository
 
     public function getDisplayHooksForHelper()
     {
-        $usableHooks = ['displayFooter', 'displayFooterBefore', 'displayCheckoutFooter', 'displayFooterAfter', 'displayLeftColumn', 'displayRightColumn', 'displayReassurance', 'displayRightColumnProduct', 'displayNav1' , 'displayNav2'];
-
         $sql = "SELECT h.id_hook as id, h.name as name
                 FROM {$this->db_prefix}hook h
                 WHERE (lower(h.`name`) LIKE 'display%')
@@ -150,10 +148,6 @@ class LinkBlockRepository
             if (preg_match('/admin/i', $hook['name'])
                 || preg_match('/backoffice/i', $hook['name'])) {
                     unset($hooks[$key]);
-            } else{
-                if (!in_array($hook['name'], $usableHooks)){
-                    unset($hooks[$key]);
-                }
             }
         }
         return $hooks;

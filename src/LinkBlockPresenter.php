@@ -85,13 +85,13 @@ class LinkBlockPresenter
     {
         $cmsLink = array();
 
-        $manufacturer = new Manufacturer((int)$id);
+        $manufacturer = new Manufacturer((int)$id, (int)$this->language->id);
 
         if (null !== $manufacturer->id) {
             $cmsLink = array(
                 'title' => $manufacturer->name,
-                'description' => $manufacturer->meta_description[(int)$this->language->id],
-                'url' => $manufacturer->getLink(),
+                'description' => $manufacturer->meta_description,
+                'url' => $this->link->getManufacturerLink($manufacturer, null, (int)$this->language->id),
             );
         }
         return $cmsLink;
@@ -143,8 +143,8 @@ class LinkBlockPresenter
     {
         $meta = Meta::getMetaByPage($staticId, (int)$this->language->id);
         return array(
-            'title' => $meta['title'],
-            'description' => $meta['description'],
+            'title' => $meta['title'] ?? '',
+            'description' => $meta['description'] ?? '',
             'url' => $this->link->getPageLink($staticId, true),
         );
     }

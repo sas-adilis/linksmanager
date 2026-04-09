@@ -189,7 +189,7 @@ class AdminLinkWidgetController extends ModuleAdminController
                     'type' => 'select',
                     'label' => $this->l('Hook'),
                     'name' => 'id_hook',
-                    'class' => 'input-lg',
+                    'class' => 'chosen',
                     'options' => array(
                         'query' => $this->repository->getDisplayHooksForHelper(),
                         'id' => 'id',
