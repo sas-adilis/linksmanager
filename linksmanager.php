@@ -59,13 +59,7 @@ class LinksManager extends Module implements WidgetInterface
 
     public function install(): bool
     {
-        if (
-            parent::install() &&
-            $this->linkBlockRepository->createTables()
-        ) {
-            return true;
-        }
-        return false;
+        return parent::install() && (bool) $this->linkBlockRepository->createTables();
     }
 
     public function isUsingNewTranslationSystem(): bool
@@ -78,6 +72,17 @@ class LinksManager extends Module implements WidgetInterface
         return
             parent::uninstall() &&
             $this->linkBlockRepository->dropTables();
+    }
+
+    /**
+     * Reset du module : rejoue l'installation complète (hooks, tables,
+     * etc.) sans supprimer les données existantes. Surcharge le
+     * comportement par défaut de PrestaShop qui appelle
+     * uninstall() + install() et ferait donc perdre les link blocks.
+     */
+    public function reset(): bool
+    {
+        return parent::uninstall() && $this->install();
     }
 
     public function installTab(): bool

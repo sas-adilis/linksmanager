@@ -31,7 +31,6 @@ class LinkBlockRepository
     {
         $engine = _MYSQL_ENGINE_;
         $success = true;
-        $this->dropTables();
 
         $queries = [
             "CREATE TABLE IF NOT EXISTS `{$this->db_prefix}link_block`(
