@@ -149,6 +149,13 @@ class LinkBlockRepository
                     unset($hooks[$key]);
             }
         }
+
+        // Add "Custom Hook" option at the end
+        $hooks[] = array(
+            'id' => 'custom',
+            'name' => '-- Custom Hook --',
+        );
+
         return $hooks;
     }
 

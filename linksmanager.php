@@ -124,13 +124,43 @@ class LinksManager extends Module implements WidgetInterface
             $hookName = $configuration['hook'];
         }
 
-        if (!$this->isCached($this->templateFile, $this->getCacheId($hookName))) {
+        $templateFile = $this->getTemplateForHook($hookName);
+
+        if (!$this->isCached($templateFile, $this->getCacheId($hookName))) {
             $this->smarty->assign([
                 'linkBlocks' => $this->getWidgetVariables($hookName, $configuration),
             ]);
         }
 
-        return $this->fetch($this->templateFile, $this->getCacheId($hookName));
+        return $this->fetch($templateFile, $this->getCacheId($hookName));
+    }
+
+    /**
+     * Returns a hook-specific template if it exists, otherwise the default one.
+     *
+     * Looks for: linksmanager-{hookname}.tpl (lowercase)
+     * In theme:  themes/sevens/modules/linksmanager/views/templates/hook/
+     * In module: modules/linksmanager/views/templates/hook/
+     *
+     * @param string|null $hookName
+     * @return string Smarty module: path
+     */
+    private function getTemplateForHook($hookName)
+    {
+        if (!empty($hookName)) {
+            $hookTemplateName = $this->name . '-' . Tools::strtolower($hookName) . '.tpl';
+            $hookTemplateFile = 'module:' . $this->name . '/views/templates/hook/' . $hookTemplateName;
+
+            // Check in theme first, then in module directory
+            $themePath = _PS_THEME_DIR_ . 'modules/' . $this->name . '/views/templates/hook/' . $hookTemplateName;
+            $modulePath = _PS_MODULE_DIR_ . $this->name . '/views/templates/hook/' . $hookTemplateName;
+
+            if (file_exists($themePath) || file_exists($modulePath)) {
+                return $hookTemplateFile;
+            }
+        }
+
+        return $this->templateFile;
     }
 
     /**
@@ -157,6 +187,15 @@ class LinksManager extends Module implements WidgetInterface
     public function clearCache($template = null, $cache_id = null, $compile_id = null)
     {
         parent::_clearCache($this->templateFile);
+
+        // Also clear cache for hook-specific templates
+        $hookTemplates = glob(_PS_MODULE_DIR_ . $this->name . '/views/templates/hook/' . $this->name . '-*.tpl');
+        if ($hookTemplates) {
+            foreach ($hookTemplates as $tplPath) {
+                $tplName = basename($tplPath);
+                parent::_clearCache('module:' . $this->name . '/views/templates/hook/' . $tplName);
+            }
+        }
     }
 
     public function getCacheId($hookName = null): string

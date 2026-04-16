@@ -23,6 +23,22 @@
 
 $(document).ready(function(){
 
+// Custom Hook field toggle
+var $hookSelect = $('#id_hook');
+var $customHookField = $('[name="custom_hook_name"]').closest('.form-group');
+
+if ($hookSelect.length && $customHookField.length) {
+    function toggleCustomHookField() {
+        if ($hookSelect.val() === 'custom') {
+            $customHookField.show();
+        } else {
+            $customHookField.hide();
+        }
+    }
+    toggleCustomHookField();
+    $hookSelect.on('change', toggleCustomHookField);
+}
+
 var repositoryListId = document.getElementById('repository-list');
 var selectedListId = document.getElementById('selected-list');
     console.log(repositoryListId);

@@ -78,6 +78,28 @@ class AdminLinkWidgetController extends ModuleAdminController
         if (Tools::isSubmit('submit' . $this->className) || Tools::isSubmit('submit' . $this->className . 'AndStay')) {
             $this->addNameArrayToPost();
 
+            // Handle custom hook: create it if needed and set the id_hook
+            if (Tools::getValue('id_hook') === 'custom') {
+                $custom_hook_name = trim(Tools::getValue('custom_hook_name'));
+                if (empty($custom_hook_name)) {
+                    $this->errors[] = $this->l('Please enter a custom hook name.');
+                    return false;
+                }
+
+                // Check if hook already exists
+                $id_hook = Hook::getIdByName($custom_hook_name);
+                if (!$id_hook) {
+                    // Create the hook
+                    $hook = new Hook();
+                    $hook->name = $custom_hook_name;
+                    $hook->title = $custom_hook_name;
+                    $hook->add();
+                    $id_hook = (int) $hook->id;
+                }
+
+                $_POST['id_hook'] = (int) $id_hook;
+            }
+
             if (!$this->processSave()) {
                 return false;
             }
@@ -197,6 +219,13 @@ class AdminLinkWidgetController extends ModuleAdminController
                     ),
                 ),
                 array(
+                    'type' => 'text',
+                    'label' => $this->l('Custom hook name'),
+                    'name' => 'custom_hook_name',
+                    'desc' => $this->l('Enter the name of the custom hook (e.g. displayMyCustomHook). It will be created automatically if it does not exist.'),
+                    'class' => 'custom-hook-name-field',
+                ),
+                array(
                     'type' => 'repository_links',
                     'label' => $this->l('Links repository'),
                     'name' => 'repository_links',
@@ -248,6 +277,7 @@ class AdminLinkWidgetController extends ModuleAdminController
 
         $helper->fields_value = (array) $block;
         $helper->fields_value['id_link_block'] = (int) $block->id;
+        $helper->fields_value['custom_hook_name'] = '';
 
         $helper->tpl_vars = array(
             'category_tree' => $this->repository->getCategories(),
