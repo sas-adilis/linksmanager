@@ -58,6 +58,24 @@ class AdminLinkWidgetController extends ModuleAdminController
         );
     }
 
+    /**
+     * Backward/forward compatible translation helper.
+     *
+     * PrestaShop 9 removed the legacy magic l() method from admin controllers.
+     * Delegating to Module::l() (still available) keeps the existing legacy
+     * translation files working on PrestaShop 1.7, 8 and 9.
+     *
+     * @param string $string
+     * @param string|bool $specific
+     * @param string|null $locale
+     *
+     * @return string
+     */
+    public function l($string, $specific = false, $locale = null)
+    {
+        return $this->module->l($string, $specific ?: 'adminlinkwidgetcontroller', $locale);
+    }
+
     public function init()
     {
         if (Tools::isSubmit('edit' . $this->className)) {
