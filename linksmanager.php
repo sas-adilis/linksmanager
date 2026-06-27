@@ -35,7 +35,7 @@ class LinksManager extends Module implements WidgetInterface
     {
         $this->name = 'linksmanager';
         $this->tab = 'front_office_features';
-        $this->version = '1.4.0';
+        $this->version = '1.4.1';
         $this->author = 'ADILIS';
         $this->bootstrap = true;
         $this->need_instance = 0;
