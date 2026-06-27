@@ -1,41 +1,51 @@
-# Checkout Terms
+# Links Manager
 
-Module PrestaShop qui permet de gérer, depuis le back-office, un nombre illimité
-de cases à cocher « à approuver » affichées pendant le tunnel de commande
-(sur le modèle de la case « conditions générales de vente »).
+Module PrestaShop qui permet de gérer des **blocs de liens** affichés dans
+différents hooks de la page (pied de page, etc.). Chaque bloc regroupe des liens
+vers des pages CMS, des produits ou des URL personnalisées.
+
+> À l'origine basé sur le module *block links* d'IQIT-COMMERCE, adapté par Adilis.
 
 ## Principe
 
-Chaque case est injectée dans le checkout via le hook natif
-**`termsAndConditions`**. Le client doit cocher toutes les cases actives avant
-de pouvoir valider sa commande — PrestaShop gère lui-même ce contrôle.
+Le module implémente `WidgetInterface` : chaque bloc est rattaché à un hook et
+rendu via `renderWidget()`. Les blocs sont gérés en back-office depuis le
+contrôleur **`AdminLinkWidget`** (onglet « Links Manager »).
 
 ## Fonctionnalités
 
-- Création/édition/suppression des cases via une **Helper List** standard
-  (Clients → Checkout Terms dans le back-office).
-- **Label multilingue** par case, HTML basique autorisé.
-- **Lien optionnel vers une page CMS** : entourez une portion du label de
-  `[crochets]` pour la transformer en lien vers la page CMS choisie.
-  Ex. : `J'accepte les [conditions générales de vente].`
-- **Activation/désactivation** de chaque case (colonne « Affichée »).
-- **Positionnement** : ordre d'affichage paramétrable, ajout automatique en fin
-  de liste, ré-indexation après suppression.
+- **Blocs de liens** multiples, rattachés au hook de son choix.
+- **Liens variés** : pages CMS, produits, ou liens personnalisés (label + URL).
+- **Multilingue** : nom de bloc et libellés par langue.
+- **Templates par hook** : un template spécifique `linksmanager-{hook}.tpl` (dans
+  le thème ou le module) est utilisé s'il existe, sinon le template par défaut.
+- **Cache** géré par hook (invalidé à l'enregistrement).
+- **`reset()` surchargé** : rejoue l'installation sans supprimer les blocs existants.
 
-## Données
+## Utilisation
 
-Deux tables :
+Le bloc peut être affiché :
 
-- `checkoutterm` — `id_checkoutterm`, `id_cms`, `active`, `position`, dates.
-- `checkoutterm_lang` — label par langue et par boutique.
+- via le **hook** auquel il est rattaché ;
+- ou explicitement dans un template : `{widget name='linksmanager' hook='displayFooter'}`.
+
+## Architecture
+
+| Élément | Rôle |
+|---|---|
+| `linksmanager.php` | Classe principale : widget, sélection de template par hook, cache. |
+| `src/LinkBlock.php` | Modèle d'un bloc de liens. |
+| `src/LinkBlockRepository.php` | Accès BDD (création/suppression des tables, lecture par hook). |
+| `src/LinkBlockPresenter.php` | Mise en forme des liens d'un bloc pour le front. |
+| `controllers/admin/AdminLinkWidgetController.php` | CRUD des blocs en back-office. |
+| `views/templates/hook/linksmanager.tpl` | Template par défaut d'un bloc. |
+| `translations/fr.php` / `en.php` | Traductions. |
 
 ## Configuration
 
-La page de configuration du module redirige directement vers le contrôleur
-`AdminCheckoutTerms` (la Helper List). Aucun réglage global : tout se passe au
-niveau de chaque case.
+La page de configuration du module redirige vers le contrôleur `AdminLinkWidget`.
 
 ## Compatibilité
 
-- PrestaShop **1.7.6.0** → version courante.
-- Auteur : **Adilis** — version **1.0.0**.
+- Auteur : **Adilis** (base IQIT-COMMERCE) — version **1.4.1**.
+- Système de traduction **legacy** (`isUsingNewTranslationSystem()` = false).
